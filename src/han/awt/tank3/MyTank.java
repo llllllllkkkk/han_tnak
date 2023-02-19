@@ -16,9 +16,31 @@ public class MyTank extends Tank {
         shot = new Shot(this);
         new Thread(shot).start();
 
+
+
         return shot;
     }
 
+    public void myTankShot(Tank myTank, Shot mytankShot, Vector<Shot> myTankShotVector, Vector<EnemyTanks> enemyTanks){
+        //控制子弹发射和消失
+        MyTank shots = new MyTank(myTank.getDirection(),myTank.x,myTank.y,4);
+        mytankShot = new Shot(shots);
+        myTankShotVector.add(mytankShot);
+
+        Thread t = new Thread(mytankShot);
+
+        //=================开始发射线程
+        t.start();
+
+        System.out.println(mytankShot.getX()+"---"+mytankShot.getY());
+        //子弹碰到敌方坦克消失 1.拿到敌方坦克坐标的集合 2.遍历集合的坐标 3.碰到就让子弹(存活置为假)
+        for (Tank tanks : enemyTanks) {
+            //判断我方坦克子弹坐标是否在敌方坦克范围内,在就消失
+        }
+
+
+
+    }
    /* public void run() {
 
         w:while (tankVector.size()!=0) {

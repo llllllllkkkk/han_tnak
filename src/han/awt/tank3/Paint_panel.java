@@ -19,7 +19,7 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
     Vector<EnemyTanks> enemyTanksVector = null;
     //Vector<EnemyTanks> boomTanksVector = null;
     Vector<Tank> tankVector = new Vector<>();
-    Vector<Shot> shotVector = new Vector();
+    Vector<Shot> enemyShotVector = new Vector();
     int enemyTank_Size=3;
     //创建一个集合装载爆炸对象
     Vector<Boom> bombVector = new Vector();
@@ -34,6 +34,8 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
     //装载我方坦克子弹线程集合
     Vector<Shot> myTankShotVector = new Vector<>();
     public Paint_panel() {
+
+
         enemyTanksVector = new Vector<>();
         myTank = new MyTank(0,300,300,4/*,enemyTanksVector*/);
 
@@ -50,7 +52,7 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
             //坦克对象添加到集合中
             enemyTanksVector.add(enemyTanks);
             //开启子弹的任务 并存储到集合中
-            shotVector.add(enemyTanks.tank_Shot());
+            enemyShotVector.add(enemyTanks.tank_Shot());
             //爆炸坦克
             //boomTanksVector.add(enemyTanks);
             tankVector.add(enemyTanks);
@@ -72,8 +74,8 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
     private void enemyTank_Shot() {
         for (int i = 0; i < enemyTanksVector.size(); i++) {
             EnemyTanks tank = enemyTanksVector.get(i);
-            if (tank.shot!=null && shotVector.size()<3 && tank.shot.isLive==false) {
-                shotVector.add(tank.tank_Shot());
+            if (tank.shot!=null && enemyShotVector.size()<3 && tank.shot.isLive==false) {
+                enemyShotVector.add(tank.tank_Shot());
             }
             //如果敌方子弹坐标在玩家坦克坐标中-让玩家坦克存活状态置为false 并且播放爆炸特效
             if ((myTank.getDirection()==0 || myTank.getDirection()==1) && (tank.shot.y > myTank.y && tank.shot.y < myTank.y+60  && tank.shot.x >= myTank.x && tank.shot.x<myTank.x+40) ) {
@@ -109,7 +111,9 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
         super.paint(g);
         this.setBackground(Color.black);
 
-        //System.out.println(myTank.getX()+"  "+myTank.getY());
+
+
+       // System.out.println(myTank.getX()+"  "+myTank.getY());
         // 0 ↑ 1↓ 2← 3→
         //System.out.println(myTank.getDirection());
         //画我方坦克
@@ -163,15 +167,15 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
 
 
         //画出敌方坦克的子弹
-        for (int i1 = 0; i1 < shotVector.size(); i1++) {
+        for (int i1 = 0; i1 < enemyShotVector.size(); i1++) {
             //开启子弹的任务 并存储到集合中
-            Shot shot = shotVector.get(i1);
+            Shot shot = enemyShotVector.get(i1);
             if (shot.isLive) {
                 g.setColor(Color.yellow);
                 g.drawOval(shot.x, shot.y, 1, 1);
             }else {
                 //System.out.println("remove");
-                shotVector.remove(shot);
+                enemyShotVector.remove(shot);
             }
         }
         //
@@ -188,13 +192,26 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
                 // System.out.println(myTank.shot.getX()+"   "+myTank.shot.getY());
                 g.setColor(Color.yellow);
                 g.drawOval(shot.getX(), shot.getY(),1,1);
-                //攻击到敌方坦克
+                //检测是否攻击到敌方坦克
                 hitTank();
+                //子弹消失
                 //子弹碰撞之后从集合中删除不再绘画
-            }else if (shot!=null && shot.getLive()==false){
+                //System.out.println(myTank.shot.getX()+"---"+myTank.shot.getY());
+
+            }
+            //System.out.println(myTank.shot.isLive);
+
+            //xxx
+//            System.out.println(myTank.shot.isLive+"..."+myTankShotVector.size());
+           // System.out.println(mytankShot==shot);
+            if (mytankShot !=null && mytankShot.isLive==false){
+                System.out.println("子弹碰到边界消失");
                 myTankShotVector.remove(shot);
             }
+
         }
+
+
         repaint();
         timer.start();
     }
@@ -209,26 +226,27 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
                 //先判断其他坦克的移动方向
                 if (tank.getDirection()==0 || tank.getDirection()==1){
                     //判断体积碰撞
-
+                        //aaa
                         if (myTank.getDirection()==0  ){
                             if (  (myTank.x >tank.x && myTank.x < tank.x+40) &&  (myTank.y>tank.y && myTank.y < tank.y+60) || (myTank.x+40 >tank.x && myTank.x+40 < tank.x+40) &&  (myTank.y>tank.y && myTank.y < tank.y+60)){
-                                System.out.println("碰撞1");
+                               // System.out.println("碰撞1");
                                 myTank.y = myTank.y+2;
                             }
                         }else if(myTank.getDirection()==1){
                             if (  (myTank.x >tank.x && myTank.x < tank.x+40) &&  (myTank.y+60>tank.y && myTank.y+60 < tank.y+60) || (myTank.x+40 >tank.x && myTank.x+40 < tank.x+40) &&  (myTank.y+60>tank.y && myTank.y+60 < tank.y+60)){
-                                System.out.println("碰撞2");
+                               // System.out.println("碰撞2");
                                 myTank.y = myTank.y-2;
                             }
+                            //bbb
                         }else if(myTank.getDirection()==2){
                             if (  (myTank.x >tank.x && myTank.x < tank.x+40) &&  (myTank.y>tank.y && myTank.y < tank.y+60) || (myTank.x >tank.x && myTank.x < tank.x+40) &&  (myTank.y+40>tank.y && myTank.y+40 < tank.y+60)){
-                                System.out.println("碰撞3");
+                               // System.out.println("碰撞3");
                                 myTank.x= myTank.x+2;
                             }
 
                         }else if(myTank.getDirection()==3){
                             if (  (myTank.x+60 >tank.x && myTank.x+60 < tank.x+40) &&  (myTank.y>=tank.y && myTank.y <= tank.y+60) || (myTank.x+60 >tank.x && myTank.x+60 < tank.x+40) &&  (myTank.y+40>tank.y && myTank.y+40 < tank.y+60)){
-                                System.out.println("碰撞4");
+                                //System.out.println("碰撞4");
                                 myTank.x= myTank.x-2;
                             }
 
@@ -239,23 +257,23 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
 
                     if (myTank.getDirection()==0  ){
                         if (  (myTank.x >tank.x && myTank.x < tank.x+60) &&  (myTank.y>tank.y && myTank.y < tank.y+40) || (myTank.x+40 >tank.x && myTank.x+40 < tank.x+60) &&  (myTank.y>tank.y && myTank.y < tank.y+40)){
-                            System.out.println("碰撞1");
+                            //System.out.println("碰撞1");
                             myTank.y = myTank.y+2;
                         }
                     }else if(myTank.getDirection()==1){
                         if (  (myTank.x >tank.x && myTank.x < tank.x+60) &&  (myTank.y+60>tank.y && myTank.y+60 < tank.y+40) || (myTank.x+40 >tank.x && myTank.x+40 < tank.x+60) &&  (myTank.y+60>tank.y && myTank.y+60 < tank.y+40)){
-                            System.out.println("碰撞2");
+                            //System.out.println("碰撞2");
                             myTank.y = myTank.y-2;
                         }
                     }else if(myTank.getDirection()==2){
                         if (  (myTank.x >tank.x && myTank.x < tank.x+60) &&  (myTank.y>tank.y && myTank.y < tank.y+40) || (myTank.x >tank.x && myTank.x < tank.x+60) &&  (myTank.y+40>tank.y && myTank.y+40 < tank.y+40)){
-                            System.out.println("碰撞3");
+                            //System.out.println("碰撞3");
                             myTank.x= myTank.x+2;
                         }
 
                     }else if(myTank.getDirection()==3){
                         if (  (myTank.x+60 >tank.x && myTank.x+60 < tank.x+60) &&  (myTank.y>=tank.y && myTank.y <= tank.y+40) || (myTank.x+60 >tank.x && myTank.x+60 < tank.x+60) &&  (myTank.y+40>tank.y && myTank.y+40 < tank.y+40)){
-                            System.out.println("碰撞4");
+                           // System.out.println("碰撞4");
                             myTank.x= myTank.x-2;
                         }
 
@@ -303,23 +321,23 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
 
                         if (enemyTanks.getDirection() == 0) {
                             if ((enemyTanks.x > tank.x && enemyTanks.x < tank.x + 40) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 60) || (enemyTanks.x + 40 > tank.x && enemyTanks.x + 40 < tank.x + 40) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 60)) {
-                                System.out.println("碰撞1");
+                              //  System.out.println("碰撞1");
                                 enemyTanks.y = enemyTanks.y + 2;
                             }
                         } else if (enemyTanks.getDirection() == 1) {
                             if ((enemyTanks.x > tank.x && enemyTanks.x < tank.x + 40) && (enemyTanks.y + 60 > tank.y && enemyTanks.y + 60 < tank.y + 60) || (enemyTanks.x + 40 > tank.x && enemyTanks.x + 40 < tank.x + 40) && (enemyTanks.y + 60 > tank.y && enemyTanks.y + 60 < tank.y + 60)) {
-                                System.out.println("碰撞2");
+                               // System.out.println("碰撞2");
                                 enemyTanks.y = enemyTanks.y - 2;
                             }
                         } else if (enemyTanks.getDirection() == 2) {
                             if ((enemyTanks.x > tank.x && enemyTanks.x < tank.x + 40) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 60) || (enemyTanks.x > tank.x && enemyTanks.x < tank.x + 40) && (enemyTanks.y + 40 > tank.y && enemyTanks.y + 40 < tank.y + 60)) {
-                                System.out.println("碰撞3");
+                               // System.out.println("碰撞3");
                                 enemyTanks.x = enemyTanks.x + 2;
                             }
 
                         } else if (enemyTanks.getDirection() == 3) {
                             if ((enemyTanks.x + 60 > tank.x && enemyTanks.x + 60 < tank.x + 40) && (enemyTanks.y >= tank.y && enemyTanks.y <= tank.y + 60) || (enemyTanks.x + 60 > tank.x && enemyTanks.x + 60 < tank.x + 40) && (enemyTanks.y + 40 > tank.y && enemyTanks.y + 40 < tank.y + 60)) {
-                                System.out.println("碰撞4");
+                              //  System.out.println("碰撞4");
                                 enemyTanks.x = enemyTanks.x - 2;
                             }
 
@@ -330,23 +348,24 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
 
                         if (enemyTanks.getDirection() == 0) {
                             if ((enemyTanks.x > tank.x && enemyTanks.x < tank.x + 60) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 40) || (enemyTanks.x + 40 > tank.x && enemyTanks.x + 40 < tank.x + 60) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 40)) {
-                                System.out.println("碰撞1");
+                               // System.out.println("碰撞1");
                                 enemyTanks.y = enemyTanks.y + 2;
                             }
+                            //zzz
                         } else if (enemyTanks.getDirection() == 1) {
                             if ((enemyTanks.x > tank.x && enemyTanks.x < tank.x + 60) && (enemyTanks.y + 60 > tank.y && enemyTanks.y + 60 < tank.y + 40) || (enemyTanks.x + 40 > tank.x && enemyTanks.x + 40 < tank.x + 60) && (enemyTanks.y + 60 > tank.y && enemyTanks.y + 60 < tank.y + 40)) {
-                                System.out.println("碰撞2");
+                              //  System.out.println("碰撞2");
                                 enemyTanks.y = enemyTanks.y - 2;
                             }
                         } else if (enemyTanks.getDirection() == 2) {
-                            if ((enemyTanks.x > tank.x && enemyTanks.x < tank.x + 60) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 40) || (enemyTanks.x > tank.x && enemyTanks.x < tank.x + 60) && (enemyTanks.y + 40 > tank.y && enemyTanks.y + 40 < tank.y + 40)) {
-                                System.out.println("碰撞3");
+                            if ((enemyTanks.x + 60 > tank.x && enemyTanks.x + 60< tank.x + 60) && (enemyTanks.y > tank.y && enemyTanks.y < tank.y + 40) || (enemyTanks.x > tank.x && enemyTanks.x < tank.x + 60) && (enemyTanks.y + 40 > tank.y && enemyTanks.y + 40 < tank.y + 40)) {
+                              //  System.out.println("碰撞3");
                                 enemyTanks.x = enemyTanks.x + 2;
                             }
 
                         } else if (enemyTanks.getDirection() == 3) {
                             if ((enemyTanks.x + 60 > tank.x && enemyTanks.x + 60 < tank.x + 60) && (enemyTanks.y >= tank.y && enemyTanks.y <= tank.y + 40) || (enemyTanks.x + 60 > tank.x && enemyTanks.x + 60 < tank.x + 60) && (enemyTanks.y + 40 > tank.y && enemyTanks.y + 40 < tank.y + 40)) {
-                                System.out.println("碰撞4");
+                              //  System.out.println("碰撞4");
                                 enemyTanks.x = enemyTanks.x - 2;
                             }
 
@@ -443,6 +462,10 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
                 enemyTanksVector.remove(tank);
                 //把子弹清空
                 myTank.shot.isLive = false;
+                //把子弹从集合中删除
+                myTankShotVector.remove(mytankShot);
+                System.out.println("子弹碰到敌方坦克消失");
+
                // break w;
             }else if ((tank.getDirection()==2 ||tank.getDirection()==3) && (myTank.shot.y > tank.y && myTank.shot.y < tank.y+40  && myTank.shot.x > tank.x && myTank.shot.x<tank.x+60)){
                 //记录爆炸坦克坐标
@@ -454,6 +477,9 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
                 //把子弹清空
                 myTank.shot.isLive = false;
                 //break w;
+                //把子弹从集合中删除
+                myTankShotVector.remove(mytankShot);
+                System.out.println("子弹碰到敌方坦克消失");
             }
         }
     }
@@ -462,6 +488,9 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
     public void keyTyped(KeyEvent e) {
 
     }
+
+    //我的坦克子弹shot
+    Shot mytankShot;
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -481,16 +510,37 @@ public class Paint_panel extends JPanel implements KeyListener,ActionListener {
         //子弹发射
         if (keyCode==KeyEvent.VK_J){
             if (myTank.shot!= null && myTank.shot.isLive) {
-                //
-                MyTank myTankShots = new MyTank(myTank.getDirection(),myTank.x,myTank.y,4);
-                Shot shot = new Shot(myTankShots);
-                myTankShotVector.add(shot);
+                //我的坦克发射子弹
+                MyTank shots = new MyTank(myTank.getDirection(),myTank.x,myTank.y,4);
+                mytankShot = new Shot(shots);
+                myTankShotVector.add(mytankShot);
 
-                Thread t = new Thread(shot);
+                Thread t = new Thread(mytankShot);
+
+                //=================开始发射线程
                 t.start();
 
+                //myTank.myTankShot(myTank,mytankShot,myTankShotVector,enemyShotVector);
+
+
+
+                /*int i=0;
+                while (i<10){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    i--;
+                }*/
+
+                /*System.out.println(mytankShot.isLive);
+                mytankShot.isLive = false;
+                System.out.println(mytankShot.isLive);*/
             }
             myTank.tank_Shot();
+
+
 
             //new Thread(myTank).start();
         }
